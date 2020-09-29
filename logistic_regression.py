@@ -23,30 +23,7 @@ class LogisticRegression:
     def _sigmoid(z):
         return 1 / (1 + np.exp(-z))
 
-    @staticmethod
-    def _loss(h, y):
-        epsilon = 1e-5  # epsion to prevent division by zero if one of arguments is 1
-        return np.average((-y * np.log(h) - (1 - y) * np.log(1 - h + epsilon)))
-
     def fit(self, X, y):
-        if self._fit_intercept:
-            X = self._add_intercept(X)
-
-        # weights initialization
-        self._theta = np.zeros(X.shape[1])
-
-        for i in range(self._num_iterations):
-            z = np.dot(X, self._theta)
-            h = self._sigmoid(z)
-            gradient = np.dot(X.T, (h - y)) / y.size
-            self._theta -= self._learning_rate * gradient
-
-            if (self._verbose and i % 10000 == 0):
-                z = np.dot(X, self._theta)
-                h = self._sigmoid(z)
-                print('Epoch ' + str(i) + ' loss:' + str(self._loss(h, y)) + '\t')
-
-    def fit_fast(self, X, y):
         self._theta = self._numba_fit(np.ascontiguousarray(X, dtype=np.float), y, self._learning_rate,
                                       self._num_iterations, self._fit_intercept, self._verbose)
 
@@ -61,9 +38,9 @@ class LogisticRegression:
         def sigmoid(z):
             return 1 / (1 + np.exp(-z))
 
-        def loss(h, y):
+        def log_loss(y_hat, y):
             epsilon = 1e-5  # epsion to prevent division by zero if one of arguments is 1
-            return np.mean((-y * np.log(h) - (1 - y) * np.log(1 - h + epsilon)))
+            return -(1/y.size)*np.sum(y * np.log(y_hat) + (1 - y) * np.log(1 - y_hat + epsilon))  # in fact is a mean
 
         if fit_intercept:
             X = add_intercept(X)
@@ -73,16 +50,16 @@ class LogisticRegression:
 
         for i in range(num_iterations):
             z = np.dot(X, theta)
-            h = sigmoid(z)
-            gradient = np.dot(X.T, (h - y)) / y.size
+            y_hat = sigmoid(z)
+            errors = y_hat - y
+            gradient = np.dot(X.T, errors) / y.size
             theta -= learning_rate * gradient
 
             if (verbose and i % 10000 == 0):
-                z = np.dot(X, theta)
-                h = sigmoid(z)
-                print('Epoch ', i, 'loss:', loss(h, y), '\t')
+                print('Iteration ', i, 'loss:', log_loss(y_hat, y), '\t')
 
         return theta
+
 
     def predict_proba(self, X):
         if self._fit_intercept:
@@ -93,7 +70,7 @@ class LogisticRegression:
         return self._sigmoid(np.dot(X, self._theta))
 
     def predict(self, X, threshold=0.5):
-        return self.predict_proba(X) >= threshold
+        return int(self.predict_proba(X) >= threshold)
 
 
 # test predictions
@@ -112,6 +89,7 @@ coef = [-0.406605464, 0.852573316, -1.104746259]
 lr = LogisticRegression()
 X = np.array(dataset)[:, :-1]
 y = np.array(dataset)[:, -1]
-lr.fit_fast(X, y)
+lr.fit(X, y)
 
 lr.predict_proba(np.array([[2.7810836, 2.550537003]]))
+lr.predict(np.array([[2.7810836, 2.550537003]]))
