@@ -1,0 +1,20 @@
+[build-system]
+requires = [ "poetry>=1.0.0",]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "h20-trial"
+version = "0.0.1"
+description = ""
+authors = ["Michal Ficek <ficem3am@gmail.com>", ]
+license = "Proprietary"
+include = [ "py.typed",]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+jupyter = "^1.0.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.3"
+pytest-cov = "^2.10.1"
+ipython = "^7.18.1"

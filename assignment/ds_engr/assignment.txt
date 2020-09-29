@@ -1,0 +1,16 @@
+1. Use the dataset (`creditcard.csv`)
+2. Implement your own Logistic Regression (https://en.wikipedia.org/wiki/Logistic_regression) estimator from scratch using arbitrary estimation method:
+	a. Avoid using 3rd party libraries like Scikit-learn and similar, which already contain this type of Model
+	b. Avoid using 3rd party libraries which implement e.g. gradient descent, for optimizing the model
+	c. You can use Numpy and similar, to operate on matrices.
+2. Use the logistic regression model you built to predict the probability of default. The variables name is `DEFAULT_PAYMENT_NEXT_MONTH`. There is a dictionary that explains all the features included in the dataset called `dictionary.txt`.
+3. Produce a report that summarizes your findings. Things to include in the report:
+	a. Describe the features and the target included in the dataset. What insight did you gain from working with the data?
+	b. Explain how you transformed the features, if at all
+	c. The validation approach taken
+	d. Which performance metrics did you use and why?
+	f. What were the most important features?
+	g. How useful is the model from a practical point of view? 
+	h. What might you do differently if you had more time/resources?
+4. This is not meant to be an exercise to develop a ‘final solution’ but more a first pass, to understand how you would approach this kind of exercise.
+5. Submit the report and any source code (these may be part of the same document if you are working with a Jupyter notebook, etc.).
