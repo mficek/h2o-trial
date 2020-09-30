@@ -46,44 +46,28 @@ d_train, X_train, y_train = process_data(d_train)
 d_valid, X_valid, y_valid = process_data(d_valid)
 d_test, X_test, y_test = process_data(d_test)
 
-##
+
+## train model
 scaler = pipeline.MinMaxScaler()
 scaler.fit(X_train)
 X_train = scaler.transform(X_train)
 
-lr = logistic_regression.LogisticRegression(learning_rate=0.1, num_iterations=10**4, verbose=100)
+lr = logistic_regression.LogisticRegression(learning_rate=0.1, num_iterations=10**3, verbose=100)
 lr.fit(X_train, y_train)
 
 # plot relative feature importance
 pd.Series(lr.coef_[1:]/np.abs(lr.coef_[1:]).sum(), index=d_train.columns[:-1]).plot.bar(title='Relative feature importance')
-# pd.Series(lr.coef_[1:]/np.abs(lr.coef_[1:]).sum(), index=d_train.columns[:-1]).abs().sort_values(ascending=False).plot.bar(title='Relative feature importance')
+pd.Series(lr.coef_[1:]/np.abs(lr.coef_[1:]).sum(), index=d_train.columns[:-1]).abs().sort_values(ascending=False).plot.bar(title='Relative feature importance')
 
-##
-X_valid = scaler.transform(X_valid)
-pm = pipeline.PerformanceMetric(lr.predict(X_valid), y_valid)
+
+## validate model
+X_valid_scaled = scaler.transform(X_valid)
+pm = pipeline.PerformanceMetric(lr.predict(X_valid_scaled), y_valid)
 print('f1:', pm.f1_score)
 
-pr_curve = []
-for threshold in np.arange(0,1,step=0.05):
-    pm = pipeline.PerformanceMetric(lr.predict(X_valid, threshold=threshold), y_valid)
-    pr_curve.append((threshold, pm.precision, pm.recall))
-pr_curve = pd.DataFrame(pr_curve, columns=['threshold', 'precision', 'recall'])
-pr_curve.set_index('threshold').plot()
+pr_curve = pipeline.PRCurve(lr.predict_proba(X_valid_scaled), y_valid)
+pr_curve.plot()
 
-##
-# **TODO**
-# - standardization, normalization
-#     - for Batch-GD or SGD scaling matters:
-#     https://www.quora.com/How-does-feature-scaling-affect-logistic-regression-model
-#     - for regularization scaling matters too:
-#     https://www.quora.com/How-does-feature-scaling-affect-logistic-regression-model
-# - feature selection
-# - feature engineering
-#     - tuple sex X education
-#     - payment vs. limit
-#     - one hot encoding?
-#     - binning?
-# - regularization
-#     - https://www.kdnuggets.com/2016/06/regularization-logistic-regression.html
-# - f1 score as performance metric
-#
+roc_curve = pipeline.ROCCurve(lr.predict_proba(X_valid_scaled), y_valid)
+roc_curve.plot()
+

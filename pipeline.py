@@ -70,3 +70,34 @@ class PerformanceMetric():
         self.precision = self.TP/(self.TP+self.FP)
         self.recall = self.TP/(self.TP+self.FN)
         self.f1_score = self.TP/(self.TP+(self.FN+self.FP)/2)
+        self.TPR = self.recall
+        self.FPR = self.FP/(self.FP + self.TN)
+
+
+class PRCurve:
+    def __init__(self, prediction_probab, truth, thresholds = np.arange(0,1,step=0.05)):
+        pr_curve = []
+        for threshold in thresholds:
+            pm = PerformanceMetric(prediction_probab >= threshold, truth)
+            pr_curve.append((threshold, pm.precision, pm.recall))
+        self.pr_curve = pd.DataFrame(pr_curve, columns=['threshold', 'precision', 'recall'])
+
+    def plot(self):
+        self.pr_curve.set_index('threshold').plot()
+
+
+class ROCCurve:
+    def __init__(self, prediction_probab, truth):
+        roc_curve = []
+        for threshold in np.arange(0, 1, step=0.05):
+            pm = PerformanceMetric(prediction_probab >= threshold, truth)
+            roc_curve.append((pm.recall, pm.FPR))
+        self.roc_curve = pd.DataFrame(roc_curve, columns=['recall', 'FPR']).sort_values(by='FPR', ascending=True)
+
+    def auc_roc_score(self):
+        return np.trapz(self.roc_curve.recall, self.roc_curve.FPR)
+
+    def plot(self):
+        ax = self.roc_curve.set_index('FPR').plot()
+        ax.set_ylabel('recall')
+        ax.set_title(f'AUC={self.auc_roc_score():.3f}')

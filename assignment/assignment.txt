@@ -5,7 +5,7 @@
 	c. You can use Numpy and similar, to operate on matrices.
 2. Use the logistic regression model you built to predict the probability of default. The variables name is `DEFAULT_PAYMENT_NEXT_MONTH`. There is a dictionary that explains all the features included in the dataset called `dictionary.txt`.
 3. Produce a report that summarizes your findings. Things to include in the report:
-	a. Describe the features and the target included in the dataset. What insight did you gain from working with the data?
+    a. Describe the features and the target included in the dataset. What insight did you gain from working with the data?
 	b. Explain how you transformed the features, if at all
 	c. The validation approach taken
 	d. Which performance metrics did you use and why?
